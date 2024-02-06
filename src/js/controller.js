@@ -1,5 +1,6 @@
 import icons from 'url:../img/icons.svg';
-console.log(icons);
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -36,8 +37,6 @@ const showRecipe = async function () {
 
     if (!res.ok) throw new Error(`🚫 ${data.message} Error:${res.status} 🚫`);
 
-    console.log(res, data, data.data.recipe);
-
     const {
       id,
       title,
@@ -59,7 +58,6 @@ const showRecipe = async function () {
       cookingTime,
       ingredients,
     };
-    console.log('The recipe: ', recipe);
 
     // // Rendering
     const markup = `
