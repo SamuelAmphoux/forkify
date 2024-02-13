@@ -1,3 +1,6 @@
 The forkify app is the final practice project in the javascript class I'm taking.
 It will summarize everything I've learnt so far condensed into one project !
-I will update this later when I get a better grasp on the project's content
+
+The project architecture follows the MVC pattern : the Model (data and business logic), the View (user interface), and the Controller (user input handling). This separation of concerns makes it easier to manage complexity, improve code reusability, and facilitate collaboration among developers.
+
+The app uses the forkify API created by @jonasschmedtman : https://forkify-api.herokuapp.com/v2
