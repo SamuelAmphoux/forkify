@@ -6,5 +6,5 @@ The project architecture follows the MVC pattern : the Model (data and business 
 The app uses the forkify API created by @jonasschmedtman : https://forkify-api.herokuapp.com/v2
 
 Functionnalities:
-\_ You can search recipes using a key word ingredient (e.g. "lemon", "chocolate", "garlic")
-\_ You can select a recipe and see the list of ingredients and their quantities
+\n \_ You can search recipes using a key word ingredient (e.g. "lemon", "chocolate", "garlic")
+\n \_ You can select a recipe and see the list of ingredients and their quantities
