@@ -9,6 +9,7 @@ export const state = {
     resultsPerPage: RES_PER_PAGE,
     page: 1,
   },
+  bookmarks: [],
 };
 
 export const loadRecipe = async function (recipeId) {
@@ -36,6 +37,10 @@ export const loadRecipe = async function (recipeId) {
       cookingTime,
       ingredients,
     };
+
+    if (state.bookmarks.some(bookmark => bookmark.id === id))
+      state.recipe.bookmarked = true;
+    else state.recipe.bookmarked = false;
   } catch (err) {
     console.error(`${err} 🧑‍💻`);
     throw err;
@@ -45,6 +50,8 @@ export const loadRecipe = async function (recipeId) {
 export const loadSearchResults = async function (query) {
   try {
     state.search.query = query;
+    state.search.page = 1;
+
     const data = await getJSON(`${API_URL}?search=${query}`);
     state.search.results = data.data.recipes.map(recipe => {
       const { id, title, publisher, image_url: image } = recipe;
@@ -75,4 +82,22 @@ export const updateServings = function (newServings) {
     ing.quantity = (ing.quantity * newServings) / state.recipe.servings;
   });
   state.recipe.servings = newServings;
+};
+
+export const addBookmark = function (recipe) {
+  // Add bookmark
+  state.bookmarks.push(recipe);
+
+  // Display current recipe as bookmarked
+  if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+};
+
+export const deleteBookmark = function (id) {
+  // Find bookmark with corresponding id
+  const index = state.bookmarks.findIndex(el => el.id === id);
+  // Delete bookmark
+  state.bookmarks.splice(index, 1);
+
+  // Display current recipe as NOT bookmarked
+  if (id === state.recipe.id) state.recipe.bookmarked = false;
 };
