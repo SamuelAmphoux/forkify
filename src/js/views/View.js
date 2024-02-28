@@ -25,14 +25,13 @@ export default class View {
 
     newElements.forEach((newEl, i) => {
       const curEl = curElements[i];
-      newEl.isEqualNode(curEl);
 
       // Update changed text
       if (
         !newEl.isEqualNode(curEl) &&
         newEl.firstChild?.nodeValue.trim() !== ''
       ) {
-        curEl.textcontent = newEl.textContent;
+        curEl.textContent = newEl.textContent;
       }
       // Update changed attributes
       if (!newEl.isEqualNode(curEl)) {
@@ -78,7 +77,7 @@ export default class View {
         <div>
           <svg>
             <use href="${icons}_#icon-smile"></use>
-          </svg>#
+          </svg>
         </div>
         <p>${message}</p>
       </div>`;
