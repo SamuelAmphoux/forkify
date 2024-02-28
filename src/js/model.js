@@ -1,5 +1,6 @@
-import { API_URL, RES_PER_PAGE } from './config.js';
-import { getJSON } from './helpers.js';
+import { API_URL, RES_PER_PAGE, API_KEY } from './config.js';
+// import { getJSON, sendJSON } from './helpers.js';
+import { AJAX } from './helpers.js';
 
 export const state = {
   recipe: {},
@@ -12,33 +13,37 @@ export const state = {
   bookmarks: [],
 };
 
+const createRecipeObject = function (data) {
+  const {
+    id,
+    title,
+    publisher,
+    source_url: sourceUrl,
+    image_url: image,
+    servings,
+    cooking_time: cookingTime,
+    ingredients,
+  } = data.data.recipe;
+
+  return {
+    id,
+    title,
+    publisher,
+    sourceUrl,
+    image,
+    servings,
+    cookingTime,
+    ingredients,
+    ...(data.data.recipe.key && { key: data.data.recipe.key }),
+  };
+};
+
 export const loadRecipe = async function (recipeId) {
   try {
-    const data = await getJSON(`${API_URL}${recipeId}`);
+    const data = await AJAX(`${API_URL}${recipeId}?key=${API_KEY}`);
+    state.recipe = createRecipeObject(data);
 
-    const {
-      id,
-      title,
-      publisher,
-      source_url: sourceUrl,
-      image_url: image,
-      servings,
-      cooking_time: cookingTime,
-      ingredients,
-    } = data.data.recipe;
-
-    state.recipe = {
-      id,
-      title,
-      publisher,
-      sourceUrl,
-      image,
-      servings,
-      cookingTime,
-      ingredients,
-    };
-
-    if (state.bookmarks.some(bookmark => bookmark.id === id))
+    if (state.bookmarks.some(bookmark => bookmark.id === state.recipe.id))
       state.recipe.bookmarked = true;
     else state.recipe.bookmarked = false;
   } catch (err) {
@@ -52,7 +57,7 @@ export const loadSearchResults = async function (query) {
     state.search.query = query;
     state.search.page = 1;
 
-    const data = await getJSON(`${API_URL}?search=${query}`);
+    const data = await AJAX(`${API_URL}?search=${query}&key=${API_KEY}`);
     state.search.results = data.data.recipes.map(recipe => {
       const { id, title, publisher, image_url: image } = recipe;
       return {
@@ -60,6 +65,7 @@ export const loadSearchResults = async function (query) {
         title,
         publisher,
         image,
+        ...(recipe.key && { key: recipe.key }),
       };
     });
   } catch (err) {
@@ -79,7 +85,13 @@ export const getSearchResultsPage = function (page = state.search.page) {
 export const updateServings = function (newServings) {
   state.recipe.ingredients.forEach(ing => {
     // newQt = oldQt * newServ / oldServ // 2 * 8 / 4 = 4
-    ing.quantity = (ing.quantity * newServings) / state.recipe.servings;
+
+    ing.quantity =
+      Math.round(
+        ((ing.quantity * newServings) / state.recipe.servings +
+          Number.EPSILON) *
+          100
+      ) / 100;
   });
   state.recipe.servings = newServings;
 };
@@ -114,8 +126,39 @@ const init = function () {
 };
 
 // // For dev purpose
-// const clearBookmarks = function() {
-//   localStorage.clear('bookmarks')
-// }
+// const clearBookmarks = function () {
+//   localStorage.clear('bookmarks');
+// };
 // clearBookmarks();
 init();
+
+export const uploadRecipe = async function (newRecipe) {
+  try {
+    const ingredients = Object.entries(newRecipe)
+      .filter(entry => entry[0].startsWith('ingredient') && entry[1] !== '')
+      .map(ing => {
+        const ingArr = ing[1].split(',').map(el => el.trim());
+        if (ingArr.length !== 3)
+          throw new Error(
+            'Wrong ingredient format! Please use the correct one'
+          );
+        const [quantity, unit, description] = ingArr;
+        return { quantity: quantity ? +quantity : null, unit, description };
+      });
+
+    const recipe = {
+      title: newRecipe.title,
+      source_url: newRecipe.sourceUrl,
+      image_url: newRecipe.image,
+      publisher: newRecipe.publisher,
+      cooking_time: +newRecipe.cookingTime,
+      servings: +newRecipe.servings,
+      ingredients,
+    };
+    const data = await AJAX(`${API_URL}?key=${API_KEY}`, recipe);
+    state.recipe = createRecipeObject(data);
+    addBookmark(state.recipe);
+  } catch (err) {
+    throw err;
+  }
+};
