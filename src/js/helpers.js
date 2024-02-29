@@ -1,5 +1,6 @@
 import { TIMEOUT_SEC } from './config';
 
+// Timer helper function to avoid unending request to the API
 const timeout = function (s) {
   return new Promise(function (_, reject) {
     setTimeout(function () {
@@ -8,6 +9,11 @@ const timeout = function (s) {
   });
 };
 
+/**
+ * @param {String} url
+ * @param {Object} uploadData The data to upload (e.g. the user's recipe)
+ * @returns {undefined}
+ */
 export const AJAX = async function (url, uploadData = undefined) {
   try {
     const fetchPro = uploadData
