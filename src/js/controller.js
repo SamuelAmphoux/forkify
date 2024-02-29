@@ -10,9 +10,12 @@ import addRecipeView from './views/addRecipeView';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-if (module.hot) {
-  module.hot.accept();
-}
+/**
+ For dev purpose
+*/
+// if (module.hot) {
+//   module.hot.accept();
+// }
 
 const controlRecipes = async function () {
   try {
@@ -121,6 +124,7 @@ const controlAddRecipe = async function (newRecipe) {
   }
 };
 
+// Initiates all the subscriber/publisher relations
 const init = function () {
   bookmarksView.addHandlerRender(controlBookmarks);
   recipeView.addHandlerRender(controlRecipes);
@@ -131,5 +135,3 @@ const init = function () {
   addRecipeView.addHandlerUploadRecipe(controlAddRecipe);
 };
 init();
-
-searchView.getQuery();

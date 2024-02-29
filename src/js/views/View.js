@@ -3,6 +3,13 @@ import icons from 'url:../../img/icons.svg';
 export default class View {
   _data;
 
+  /**
+   * Render the received object to the DOM
+   * @param {Object | Object[]} data The data to be rendered (e.g. recipe)
+   * @param {boolean} [render=true] If false create markup instead of rendering to the DOM
+   * @returns {undefined | string} A markup string is returned if render=false
+   * @this {Object} View instance
+   */
   render(data, render = true) {
     if (!data || (Array.isArray(data) && data.length === 0))
       return this.renderError();
@@ -15,6 +22,12 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  /**
+   * Update the DOM without rendering the whole page again
+   * @param {Object | Object[]} data The data to be rendered (e.g. recipe)
+   * @returns {undefined}
+   * @this {Object} View instance
+   */
   update(data) {
     this._data = data;
     const newMarkup = this._generateMarkup();
@@ -46,6 +59,7 @@ export default class View {
     this._parentElement.innerHTML = '';
   }
 
+  // Display spinner animation before page is fully rendered
   renderSpinner() {
     const markup = `
     <div class="spinner">
@@ -57,6 +71,7 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  // Display formatted error message
   renderError(message = this._errorMessage) {
     const markup = `
       <div class="error">
@@ -71,6 +86,7 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  // Display successful formatted message
   renderMessage(message = this._message) {
     const markup = `
       <div class="message">
